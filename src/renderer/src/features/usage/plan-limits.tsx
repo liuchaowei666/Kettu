@@ -159,26 +159,27 @@ function PlanCard({ card, named, now }: { card: UsageCard; named: boolean; now: 
   const view = useLimitView()
   const shortName = useShortWindow()
   const where = [...new Set(card.places.map((place) => hostName(place.hostId)))]
+  // A balance's name and amount, in the locale's money format, for both the rows and the hero.
+  const balanceName = (label: string) =>
+    label === 'Prepaid balance'
+      ? t('limits.prepaidBalance')
+      : label === 'Extra usage'
+        ? t('limits.extraUsage')
+        : label
+  const balanceText = (balance: { amount: number; currency: string }) =>
+    planBalance(
+      balance.amount,
+      balance.currency,
+      balance.currency === 'credits'
+        ? t('limits.units.credits')
+        : balance.currency === 'requests'
+          ? t('limits.units.premiumRequests')
+          : balance.currency,
+    )
   const balanceRows = (card.balances ?? []).map((balance) => (
     <span key={`${balance.label}/${balance.currency}`} className="k-u-plan__balance">
-      <span>
-        {balance.label === 'Prepaid balance'
-          ? t('limits.prepaidBalance')
-          : balance.label === 'Extra usage'
-            ? t('limits.extraUsage')
-            : balance.label}
-      </span>
-      <b>
-        {planBalance(
-          balance.amount,
-          balance.currency,
-          balance.currency === 'credits'
-            ? t('limits.units.credits')
-            : balance.currency === 'requests'
-              ? t('limits.units.premiumRequests')
-              : balance.currency,
-        )}
-      </b>
+      <span>{balanceName(balance.label)}</span>
+      <b>{balanceText(balance)}</b>
     </span>
   ))
   const age = !failed && card.readAt !== null && now - card.readAt > STALE && (
@@ -210,15 +211,22 @@ function PlanCard({ card, named, now }: { card: UsageCard; named: boolean; now: 
             {balanceRows}
           </span>
         </div>
+      ) : card.rings.length === 0 && (card.balances?.length ?? 0) > 0 ? (
+        <div className="k-u-plan__body k-u-plan__body--balance">
+          {(card.balances ?? []).map((balance) => (
+            <span key={`${balance.label}/${balance.currency}`} className="k-u-balance">
+              <span className="k-u-balance__label">{balanceName(balance.label)}</span>
+              <span className="k-u-balance__amount">{balanceText(balance)}</span>
+            </span>
+          ))}
+        </div>
       ) : card.rings.length === 0 ? (
         <div className="k-u-plan__body">
-          {(card.balances?.length ?? 0) === 0 && <span aria-hidden className="k-u-rings--empty" />}
+          <span aria-hidden className="k-u-rings--empty" />
           <span className="flex min-w-0 flex-1 flex-col gap-1">
-            {(card.balances?.length ?? 0) === 0 && (
-              <span className="k-u-plan__none" data-failed={failed || undefined}>
-                {failed ? t('limits.neverRead') : t('limits.notYet')}
-              </span>
-            )}
+            <span className="k-u-plan__none" data-failed={failed || undefined}>
+              {failed ? t('limits.neverRead') : t('limits.notYet')}
+            </span>
             {balanceRows}
           </span>
         </div>
