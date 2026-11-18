@@ -713,6 +713,12 @@ export function Composer({
             )}
             <span className="kettu-tray__group kettu-tray__group--end">
               <SpeedButton speed={session.speed} />
+              {agent?.balance && agent.balance.balances.length > 0 && (
+                <span className="kettu-tray-limit" data-level="mid" title="DeepSeek 余额">
+                  {agent.balance.balances[0]!.currency === 'CNY' ? '¥' : '$'}
+                  {agent.balance.balances[0]!.amount.toFixed(2)}
+                </span>
+              )}
               <CacheButton cache={timed} running={running} used={session.usage?.used ?? 0} />
               <AgentMarkHost.Provider value={hostId}>
                 <ContextButton

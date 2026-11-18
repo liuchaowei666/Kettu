@@ -39,7 +39,7 @@ electronFuses:
   enableNodeCliInspectArguments: false
 publish:
   provider: github
-  owner: KettuAI
+  owner: liuchaowei666
   repo: Kettu
   releaseType: draft
 

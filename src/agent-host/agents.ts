@@ -115,7 +115,6 @@ import {
 import {
   clearApiKey as clearDshKey,
   readApiKey as readDshKey,
-  readProvider as readDshProvider,
   writeApiKey as writeDshKey,
 } from './dsh/credentials'
 import { readClaudeSettings, writeClaudeSetting, type ListedModel } from './claude/user-settings'
@@ -776,6 +775,13 @@ export class AgentManager {
       await this.deps.env.ready()
       await Promise.all([...this.harnesses.values()].map((h) => this.detect(h)))
       this.noteStartMoves()
+      // Local: read the DeepSeek balance once the host is up, so the usage page and the
+      // composer have it without opening the agent's settings first.
+      setTimeout(() => {
+        try {
+          void this.refreshBalance(this.slot('deepseek'), true).catch(() => {})
+        } catch {}
+      }, 3000).unref?.()
     })()
     return this.detected
   }
@@ -4228,7 +4234,7 @@ export class AgentManager {
   private async readBalance(slot: Slot): Promise<void> {
     await this.detectAll()
     const env = { ...this.deps.env.agentEnv(slot.id), DSH_HOME: this.dshFolder(slot) }
-    const key = (await readDshProvider(env)) === 'deepseek-official' ? await readDshKey(env) : null
+    const key = await readDshKey(env)
     const now = Date.now()
     const previous = slot.balance
     if (!key) {
@@ -4241,6 +4247,8 @@ export class AgentManager {
           ? { ...usage, balances: previous.balances, observedAt: previous.observedAt }
           : usage
     }
+    // Local: the balance is also what the usage page and the composer show.
+    slot.balances = slot.balance ? slot.balance.balances : []
     slot.balanceReadAt = now
     this.emit(slot)
   }

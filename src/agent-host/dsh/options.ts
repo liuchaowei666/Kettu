@@ -8,6 +8,8 @@ export const CONFIG = { mode: 'mode', model: 'model', effort: 'effort' } as cons
 
 /** The models dsh 0.2.2 lists for its DeepSeek routes, by id. */
 const MODELS = [
+  // Local: Magpie's DeepSeek routing group first, the official routes kept.
+  { id: 'group/deepseek-2', name: 'DeepSeek (Magpie)' },
   { id: 'deepseek-flash', name: 'DeepSeek V4.1 Flash' },
   { id: 'deepseek-v4-pro', name: 'DeepSeek V4 Pro' },
 ] as const
@@ -19,7 +21,7 @@ export const MODES = ['plan', 'read-only', 'workspace-write', 'danger-full-acces
 
 export type Mode = (typeof MODES)[number]
 
-export const DEFAULT_MODEL = 'deepseek-flash'
+export const DEFAULT_MODEL = 'group/deepseek-2'
 export const DEFAULT_EFFORT = 'high'
 export const DEFAULT_PRESET = 'workspace-write'
 

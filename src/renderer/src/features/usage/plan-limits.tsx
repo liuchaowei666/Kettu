@@ -212,11 +212,13 @@ function PlanCard({ card, named, now }: { card: UsageCard; named: boolean; now: 
         </div>
       ) : card.rings.length === 0 ? (
         <div className="k-u-plan__body">
-          <span aria-hidden className="k-u-rings--empty" />
+          {(card.balances?.length ?? 0) === 0 && <span aria-hidden className="k-u-rings--empty" />}
           <span className="flex min-w-0 flex-1 flex-col gap-1">
-            <span className="k-u-plan__none" data-failed={failed || undefined}>
-              {failed ? t('limits.neverRead') : t('limits.notYet')}
-            </span>
+            {(card.balances?.length ?? 0) === 0 && (
+              <span className="k-u-plan__none" data-failed={failed || undefined}>
+                {failed ? t('limits.neverRead') : t('limits.notYet')}
+              </span>
+            )}
             {balanceRows}
           </span>
         </div>
