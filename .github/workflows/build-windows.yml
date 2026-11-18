@@ -43,7 +43,7 @@ jobs:
           CHANGED=0
           if [ "$(git rev-list --count HEAD..upstream/main)" -gt 0 ]; then CHANGED=1; fi
           git rebase upstream/main
-          git push origin HEAD:main
+          git push --force-with-lease origin HEAD:main
           echo "CHANGED=$CHANGED" >> "$GITHUB_ENV"
 
       - name: Stop when nothing new and not run by hand
